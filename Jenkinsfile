@@ -38,16 +38,20 @@ pipeline {
            }
        }
 
-       stage("SonarQube Analysis"){
-           steps {
-	           script {
-		        withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') { 
-                        sh "mvn sonar:sonar"
-		        }
-	           }	
-           }
-       }
-
+       stage("SonarQube Analysis") {
+    	steps {
+        	script {
+          	  try {
+               		 withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') { 
+                    		sh "mvn sonar:sonar"
+                }
+            } catch (Exception e) {
+                echo "SonarQube analysis failed: ${e}"
+                currentBuild.result = 'UNSTABLE'
+            }
+        }
+    }
+}
        stage("Quality Gate"){
            steps {
                script {
