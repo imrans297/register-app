@@ -57,22 +57,21 @@ pipeline {
 
        //  }
 
-	stage("Build & Push Docker Image") {
-	    steps {
-	        script {
-	            // Use Docker credentials stored in Jenkins
-	            docker.withRegistry('', 'docker-cred') {
-	                def docker_image = docker.build("${IMAGE_NAME}")
-	                
-	                // Push the Docker image with credentials
-	                docker.withRegistry('', 'docker_cred') {
-	                    docker_image.push("${IMAGE_TAG}")
-	                   // docker_image.push('latest')
-	                }
-	            }
-	        }
-	    }
-	}
+	  stage("Build & Push Docker Image") {
+            steps {
+                script {
+                    docker.withRegistry('',DOCKER_CRED) {
+                        docker_image = docker.build("${IMAGE_NAME}")
+                    }
+
+                    docker.withRegistry('',DOCKER_CRED) {
+                        docker_image.push("${IMAGE_TAG}")
+                        docker_image.push('latest')
+                    }
+                }
+            }
+
+       }
 
        stage("Trivy Scan") {
            steps {
